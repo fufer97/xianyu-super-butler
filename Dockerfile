@@ -63,6 +63,9 @@ COPY --from=builder /app /app
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+# 国内网络构建：Chromium 走 npmmirror 镜像，避免官方 CDN 连接超时
+ENV PLAYWRIGHT_DOWNLOAD_HOST=https://cdn.npmmirror.com/binaries/playwright
+
 RUN playwright install-deps chromium && \
     playwright install chromium && \
     mkdir -p /app/logs /app/data /app/backups /app/static/uploads/images && \

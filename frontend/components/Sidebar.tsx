@@ -8,6 +8,7 @@ import {
   CreditCard,
   KeyRound,
   LayoutDashboard,
+  Link2,
   ListFilter,
   Loader2,
   LogOut,
@@ -91,6 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, mo
       label: '自动化',
       items: [
         { id: 'product-automation', icon: Workflow, label: '商品自动化' },
+        { id: 'gateway', icon: Link2, label: '取卡网关' },
       ],
     },
     {

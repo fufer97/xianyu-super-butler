@@ -592,6 +592,14 @@ const App: React.FC = () => {
           <section hidden={activeTab !== 'cards'}>
             <Suspense fallback={activeTab === 'cards' ? <PageLoader /> : null}><CardList /></Suspense>
           </section>
+          <section hidden={activeTab !== 'gateway'}>
+            <iframe
+              src="http://127.0.0.1:8100/admin"
+              title="取卡网关"
+              className="w-full rounded-xl border border-gray-200 bg-white"
+              style={{ height: 'calc(100vh - 9rem)' }}
+            />
+          </section>
           <section hidden={activeTab !== 'auto-reply'}>
             <Suspense fallback={activeTab === 'auto-reply' ? <PageLoader /> : null}><Keywords mode="reply" /></Suspense>
           </section>
