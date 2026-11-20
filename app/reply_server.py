@@ -478,6 +478,15 @@ async def health_check():
         )
 
 
+@app.get('/gateway-token')
+async def gateway_token(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """取卡网关管理页（iframe）令牌下发：仅登录用户可取，令牌来自部署环境变量。
+
+    管家前端把该令牌 postMessage 给网关 iframe，免去用户手动输入。
+    """
+    return {"token": os.environ.get("GATEWAY_TOKEN", "")}
+
+
 # 服务 React 前端 SPA - 所有前端路由都返回 index.html
 async def serve_frontend():
     """服务 React 前端 SPA"""

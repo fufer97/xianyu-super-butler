@@ -55,6 +55,7 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('active_page') || 'dashboard');
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const gatewayFrameRef = React.useRef<HTMLIFrameElement>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
@@ -63,6 +64,26 @@ const App: React.FC = () => {
   const [loginNotice, setLoginNotice] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // 取卡网关子页：iframe 内管理页请求令牌时，从后端取 GATEWAY_TOKEN 转发（仅登录后）。
+  React.useEffect(() => {
+    if (!isLoggedIn || activeTab !== 'gateway') return;
+    const handler = async (event: MessageEvent) => {
+      if (event.data?.type !== 'gw-token-req') return;
+      try {
+        const r = await fetch('/gateway-token', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}` },
+        });
+        const d = await r.json();
+        event.source?.postMessage(
+          { type: 'gw-token', token: d.token || '' },
+          { targetOrigin: event.origin },
+        );
+      } catch { /* 忽略，管理页会重试 */ }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [isLoggedIn, activeTab]);
 
   // 注册相关。是否显示入口由后台「允许用户注册」控制，
   // 是否需要填验证码由后台「注册邮箱验证」控制（没配 SMTP 时可以关掉）。
@@ -594,6 +615,7 @@ const App: React.FC = () => {
           </section>
           <section hidden={activeTab !== 'gateway'}>
             <iframe
+              ref={gatewayFrameRef}
               src="http://127.0.0.1:8100/admin"
               title="取卡网关"
               className="w-full rounded-xl border border-gray-200 bg-white"
